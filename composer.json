@@ -1,0 +1,22 @@
+{
+    "name": "FormGuide/PHPFormValidator",
+    "description": "A PHP Library for Self-Documenting Form Validations",
+    "license": "LGPL3",
+    "keywords": ["form validation", "php form validation"],
+    "authors": [
+        {
+            "name": "Prasanth M J"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FormGuide\\PHPFormValidator\\": "src"
+        }
+    }
+}

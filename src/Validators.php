@@ -3,93 +3,146 @@ namespace FormGuide\PHPFormValidator;
 
 class Validators
 {
-	private $field_name;
-	private $errors;
+    private $field_name;
+    private $errors;
+    private $validators_list;
 
-	public function __construct($field_name)
-	{
-		$this->field_name = $field_name;
-		$this->errors = array();
-	}
+    public function __construct($field_name)
+    {
+        $this->field_name = $field_name;
+        $this->errors = array();
+        $this->validators_list = include('ValidatorsList.php');
+    }
 
-	public static function create($field_name)
-	{
-		return new Validators($field_name);
-	}
+    public static function create($field_name)
+    {
+        return new Validators($field_name);
+    }
 
-	public function required($post, $details=array())
-	{
-		if(empty($post[$this->field_name]))
-		{
-			$this->addError("{$this->field_name} is Required.");
-			return false;
-		}
+    public function required($post, $details=array())
+    {
+        if(empty($post[$this->field_name]))
+        {
+            $this->addError("{$this->field_name} is Required.");
+            return false;
+        }
 
-		$value = trim($post[$this->field_name]);
+        $value = trim($post[$this->field_name]);
 
-		if(empty($value))
-		{
-			$this->addError("{$this->field_name} is Required.");
-			return false;
-		}
-		return true;
-	}
+        if(empty($value))
+        {
+            $this->addError("{$this->field_name} is Required.");
+            return false;
+        }
+        return true;
+    }
 
-	public function email($post)
-	{
-		if(empty($post[$this->field_name]))
-		{
-			return true;
-		}
+    public function __call($function, $arguments)
+    {
+        //if(in_array('email', $this->validator_names,TRUE))
+        if(isset($this->validators_list[$function]))
+        {
+            $post = $arguments[0];
+            $details = $arguments[1];
+            return $this->testField($function, $post, $details);
+        }
+        else
+        {
+            trigger_error('Call to undefined method '.__CLASS__.'::'.$function.'()', E_USER_ERROR);
+        }
+    }
 
-		if(!filter_var($post[$this->field_name] , FILTER_VALIDATE_EMAIL))
-		{
-			$this->addError("{$this->field_name} must be a valid email address");
-			return false;
-		}
-		return true;
-	}
+    private function testField($validation, $post, $details)
+    {
+        if(empty($post[$this->field_name]))
+        {
+            return true;
+        }
+        $fn = 'check_'.$validation;
 
-	public function maxlen($post, $details)
-	{
-		if(empty($post[$this->field_name]))
-		{
-			return true;
-		}
-		
-		$maxlen = intval($details['value']);
+        $res = $this->$fn($post, $details);
 
-		if(strlen($post[$this->field_name]) > $maxlen)
-		{
-			$this->addError("{$this->field_name} exceeded maximum length allowed ($maxlen).");
-			return false;
-		}
-		return true;
-	}
+        if(false === $res)
+        {
+            $this->validationError($validation, $details);
+        }
+        return $res;
+    }
 
-	public function addError($error)
-	{
-		$this->errors[] = $error;
-	}
+    private function check_email($post,$details)
+    {
+        return (filter_var($post[$this->field_name] , FILTER_VALIDATE_EMAIL) === false)?false:true;
+    }
 
-	public function hasErrors()
-	{
-		return empty($this->errors)?false:true;	
-	}
+    private function check_maxlen($post, $details)
+    {
+        $maxlen = intval($details['value']);
 
-	public function getErrorCount()
-	{
-		return count($this->errors);
-	}
-	public function getError()
-	{
-		if(empty($this->errors))
-		{
-			return null;
-		}
-		else
-		{
-			return $this->errors[0];
-		}
-	}
+        return (strlen($post[$this->field_name]) <= $maxlen);
+    }
+
+    private function check_minlen($post,$details)
+    {
+        $minlen = intval($details['value']);
+        return (strlen($post[$this->field_name]) >= $minlen);
+    }
+
+    public function check_alphabetic($post,$details)
+    {
+        return ctype_alpha($post[$this->field_name]);
+    }
+
+    public function check_alphanumeric($post,$details)
+    {
+        return ctype_alnum($post[$this->field_name]);
+    } 
+
+    public function check_alphabetic_space($post,$details)
+    {
+        $value = str_replace(' ','',$post[$this->field_name]);
+        return ctype_alpha($value);
+    }
+
+    public function check_alphanumeric_space($post,$details)
+    {
+        $value = str_replace(' ','',$post[$this->field_name]);
+        return ctype_alnum($value);
+    }        
+
+    private function validationError($validation,$details)
+    {
+        $error_msg = '';
+        if(!empty($this->validators_list[$validation]['message']))
+        {
+            $error_msg = $this->validators_list[$validation]['message'];
+        }
+
+        $this->addError($error_msg);
+    }
+
+    public function addError($error)
+    {
+        $this->errors[] = $error;
+    }
+
+    public function hasErrors()
+    {
+        return empty($this->errors)?false:true; 
+    }
+
+    public function getErrorCount()
+    {
+        return count($this->errors);
+    }
+    public function getError()
+    {
+        if(empty($this->errors))
+        {
+            return null;
+        }
+        else
+        {
+            return $this->errors[0];
+        }
+    }
 }

@@ -28,22 +28,22 @@ composer require FormGuide/PHPFormValidator
 
 ## Declaring validations for single fields
 
-'''php
+```php
 $validator->field('email')->isEmail()->isRequired();
-'''
+```
 
 ## Declaring validations for multiple fields 
 
-'''php
+```php
 $validator->fields(['name','email'])->areRequired()->maxLength(50);
-'''
+```
 
 This is equivalent to:
 
-'''php
+```php
 $validator->field('name')->isRequired()->maxLength(50);
 
 $validator->field('email')->isRequired()->maxLength(50);
-'''
+```
 
 

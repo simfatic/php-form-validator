@@ -26,7 +26,7 @@ class FieldValidator
         }
         else
         {
-            trigger_error('Call to undefined method '.__CLASS__.'::'.$name.'()', E_USER_ERROR);         
+            trigger_error('Call to undefined method '.__CLASS__.'::'.$function.'()', E_USER_ERROR);         
         }
     
     }

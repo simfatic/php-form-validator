@@ -1,11 +1,11 @@
 {
     "name": "FormGuide/PHPFormValidator",
     "description": "A PHP Library for Self-Documenting Form Validations",
-    "license": "LGPL3",
+    "license": "MIT",
     "keywords": ["form validation", "php form validation"],
     "authors": [
         {
-            "name": "Prasanth M J"
+            "name": "Prasanth Janardhanan"
         }
     ],
     "require": {

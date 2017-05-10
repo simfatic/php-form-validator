@@ -64,7 +64,7 @@ class Validators
 
         if(false === $res)
         {
-            $this->validationError($validation, $details);
+            $this->validation_error($validation, $details);
         }
         return $res;
     }
@@ -109,15 +109,32 @@ class Validators
         return ctype_alnum($value);
     }        
 
-    private function validationError($validation,$details)
+    private function validation_error($validation,$details)
     {
         $error_msg = '';
-        if(!empty($this->validators_list[$validation]['message']))
+
+        if(isset($details['message']))
+        {
+            $error_msg = $details['message'];
+        }
+        elseif(!empty($this->validators_list[$validation]['message']))
         {
             $error_msg = $this->validators_list[$validation]['message'];
         }
 
+        $error_msg = $this->interpolate_message($error_msg, $details);
+
         $this->addError($error_msg);
+    }
+
+    private function interpolate_message($message, $details)
+    {
+        $constraint = isset($details['value']) ? $details['value']: '';
+
+        $replacements = array('%field%' => $this->field_name,
+                         '%constraint%' => $constraint) ;
+
+        return strtr($message, $replacements);
     }
 
     public function addError($error)

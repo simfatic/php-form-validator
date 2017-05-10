@@ -50,6 +50,60 @@ class FormValidatorTest extends TestCase
         $this->assertFalse( empty($asso_errors['email']) );
     }
 
+    public function testDefaultErrorMessages()
+    {
+        $validator = FormValidator::create();
+
+        $validator->field('name')->isRequired();
+        $validator->field('email')->isEmail();
+
+        $validator->test(['email'=>'plaintext']);
+
+        $this->assertTrue($validator->hasErrors());
+
+        $asso_errors = $validator->getErrors(/*associative*/ true);
+
+        $this->assertEquals($asso_errors['email'], "email must be a valid email address");
+
+        
+    }
+
+    public function testMaxLengthErrorMessageInterpolation()
+    {
+        $validator = FormValidator::create();
+
+        $validator->field('name')->isRequired()->maxLength(5);
+        
+
+        $validator->test(['name'=>'exceeds max length']);
+
+        $this->assertTrue($validator->hasErrors());
+
+        $asso_errors = $validator->getErrors(/*associative*/ true);
+
+        $this->assertEquals($asso_errors['name'], "name length shouldn't exceed  5");
+
+        
+    }
+
+    public function testMaxLengthCustomMessageInterpolation()
+    {
+        $validator = FormValidator::create();
+
+        $validator->field('name')->isRequired()->maxLength(5,['message'=>'%field% too long. maxlength = %constraint%']);
+        
+
+        $validator->test(['name'=>'exceeds max length']);
+
+        $this->assertTrue($validator->hasErrors());
+
+        $asso_errors = $validator->getErrors(/*associative*/ true);
+
+        $this->assertEquals($asso_errors['name'], "name too long. maxlength = 5");
+
+        
+    }
+
     public function testMultipleFields()
     {
         $validator = FormValidator::create();

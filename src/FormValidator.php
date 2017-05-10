@@ -47,6 +47,7 @@ class FormValidator
         {
             $rule->test($post); 
         }
+        return $this->hasErrors()?false:true;
     }
 
     public function hasErrors()

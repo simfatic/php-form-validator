@@ -2,7 +2,6 @@
 <phpunit bootstrap="./tests/TestHelper.php"
          backupGlobals="false"
          backupStaticAttributes="false"
-         strict="true"
          colors="true"
          verbose="true">
     <testsuites>
